@@ -7,7 +7,7 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "jsx": "react",
+    "jsx": "preserve",
     "lib": [
       "es6",
       "dom",
@@ -35,7 +35,14 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "exclude": [
     "node_modules",
@@ -52,7 +59,8 @@
   ],
   "include": [
     "src",
-    "typings"
+    "typings",
+    ".next/types/**/*.ts"
   ],
   "rootDir": "src",
   "typeRoots": [
@@ -61,4 +69,3 @@
     "models"
   ]
 }
- 
