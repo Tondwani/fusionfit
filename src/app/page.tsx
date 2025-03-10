@@ -41,7 +41,7 @@ export default function Home() {
           items={[
             {
               key: '1',
-              label: '',
+              label: 'About Us',
               children: (
                 <div className={styles.aboutSection}>
                   <Paragraph>

@@ -20,7 +20,7 @@ export default function Dashboard() {
           Welcome Back!
         </Title>
         <Card className={styles.mainCard}>
-          <Title level={4}>Your Fitness Journey Starts Here !!</Title>
+          <Title level={4}>Your Fitness Journey Starts Here</Title>
         </Card>
       </Content>
     </Layout>
