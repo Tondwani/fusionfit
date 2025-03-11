@@ -57,17 +57,12 @@
     min-height: 600px; /* Added minimum height */
   }
 
-:global(.ant-menu.ant-menu-dark) {
+.menuDark {
   background: #312e81;
 }
 
-:global(.ant-menu-dark .ant-menu-item-selected) {
+.menuItemSelected {
   background-color: #4338ca !important;
-}
-
-:global(.ant-card) {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  border-radius: 8px;
 }
 
 @media (max-width: 768px) {
