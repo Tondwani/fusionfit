@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <Layout className={styles.layout}>
       <Header className={styles.header}>
-        <Title level={2} style={{ color: 'white', margin: 0 }}>
+        <Title level={2} style={{ color: 'indigo purple', margin: 0 }}>
           Fusion Gym
         </Title>
       </Header>
@@ -29,7 +29,7 @@ export default function Home() {
           <Button 
             type="primary" 
             size="large" 
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push('/form')}
             className={styles.joinButton}
           >
             Join Now
@@ -41,7 +41,7 @@ export default function Home() {
           items={[
             {
               key: '1',
-              label: 'About Us',
+              label: '',
               children: (
                 <div className={styles.aboutSection}>
                   <Paragraph>
@@ -60,7 +60,7 @@ export default function Home() {
 
       <Footer className={styles.footer}>
         <Space direction="vertical" align="center">
-          <Typography.Text>© {new Date().getFullYear()} Fusion Gym</Typography.Text>
+          <Typography.Text>© {new Date().getFullYear()} Fusion Gym. All rights Reserved</Typography.Text>
           <Typography.Text>&ldquo;Strength doesn&apos;t come from what you can do. It comes from overcoming the things you once thought you couldn&apos;t.&rdquo;</Typography.Text>
         </Space>
       </Footer>

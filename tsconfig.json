@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "esModuleInterop": true,
@@ -9,12 +9,14 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "lib": [
+      "es6",
       "dom",
-      "dom.iterable",
+      "es2016",
+      "es2017",
       "esnext"
     ],
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "noImplicitAny": false, // TODO: change to true after first successfull build
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -24,10 +26,10 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
+    "strict": false,
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
-    "target": "es5",
+    "target": "ESNext",
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -43,12 +45,21 @@
     ]
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "build",
+    "dist",
+    "example",
+    "rollup.config.mjs",
+    "**/tests",
+    "**/*.test.js",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.stories.d.ts",
+    "**/__tests__/**"
   ],
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src",
+    "typings",
     ".next/types/**/*.ts"
   ],
   "rootDir": "src",

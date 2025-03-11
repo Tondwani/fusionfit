@@ -1,4 +1,3 @@
-
 import { createContext } from "react";
 
 // Interface defining the shape of a Trainer object
@@ -9,7 +8,7 @@ export interface ITrainer {
   confirmPassword?: string;
   role: string;
   contactNumber: string;
-  PlanType: string
+  planType: string  // Changed from PlanType
   activeState: boolean;
   trial: boolean;
   policiesAccepted: boolean;

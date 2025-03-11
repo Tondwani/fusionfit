@@ -1,12 +1,16 @@
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, message } from "antd"; 
 import { useTrainerActions } from "@/providers/TrainerProvider";
-
 
 const TrainerLogin = () => {
   const { loginTrainer } = useTrainerActions();
 
-  const onFinish = (values) => {
-    loginTrainer(values.email, values.password);
+  const onFinish = async (values) => {
+    try {
+      await loginTrainer(values.email, values.password);
+      message.success("Login successful!"); // Success message
+    } catch (error) {
+      message.error("Login failed. Please check your credentials."); // Error message
+    }
   };
 
   return (
