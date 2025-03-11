@@ -1,0 +1,73 @@
+.dashboardLayout {
+  min-height: 100vh;
+  background: #4338ca;
+}
+
+.sider {
+  background: #312e81 !important;
+}
+
+.logo {
+  height: 64px;
+  padding: 16px;
+  color: white;
+  font-size: 20px;
+  text-align: center;
+  background: #4338ca;
+}
+
+.dashboardHeader {
+  background: #312e81;
+  padding: 0 24px;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.dashboardContent {
+  margin: 24px;
+  padding: 24px;
+  padding-top: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #4338ca;
+  min-height: 100vh;
+}
+
+.welcomeText {
+  color: white;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
+
+.mainCard {
+    width: 85%;
+    max-width: 800px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 2cm; /* Changed from -20px to 4cm to move it down */
+    margin-left: auto; /* Center horizontally */
+    margin-right: auto; /* Center horizontally */
+    min-height: 600px; /* Added minimum height */
+  }
+
+.menuDark {
+  background: #312e81;
+}
+
+.menuItemSelected {
+  background-color: #4338ca !important;
+}
+
+@media (max-width: 768px) {
+  .dashboardContent {
+    margin: 12px;
+    padding: 12px;
+  }
+}

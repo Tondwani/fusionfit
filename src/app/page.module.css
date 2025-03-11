@@ -1,77 +1,11 @@
 .layout {
   min-height: 100vh;
-  background-color: #800080;
-  display: flex;
-  flex-direction: column;
-}
 
-.header {
-  background: #1a237e;
   position: fixed;
   width: 100%;
   z-index: 1;
   padding: 0 50px;
 }
 
-.content {
-  flex: 1;
-  padding: 0;
-  margin-top: 64px;
-  display: flex;
-  flex-direction: column;
-}
 
-.mainContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0 50px;
-}
 
-.heroSection {
-  text-align: center;
-  padding: 60px 0;
-  background: white;
-}
-
-.heroParagraph {
-  font-size: 18px;
-  max-width: 800px;
-  margin: 20px auto;
-}
-
-.joinButton {
-  background: #6B46C1;
-  border-color: #6B46C1;
-  height: 50px;
-  padding: 0 40px;
-  font-size: 18px;
-}
-
-.joinButton:hover {
-  background: #553C9A !important;
-  border-color: #553C9A !important;
-}
-
-.aboutSection {
-  padding: 40px 0;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.gymImage {
-  width: 100%;
-  height: calc(100vh - 180px);
-  position: relative;
-  overflow: hidden;
-}
-
-.footer {
-  background: #1a237e;
-  color: white;
-  text-align: center;
-  padding: 24px 50px;
-  margin-top: auto;
-}
