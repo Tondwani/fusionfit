@@ -24,14 +24,3 @@ export default function Home() {
             Join Now
           </Button>
 
-      </Content>
-
-      <Footer className={styles.footer}>
-        <Space direction="vertical" align="center">
-          <Typography.Text>© {new Date().getFullYear()} Fusion Gym</Typography.Text>
-          <Typography.Text>&ldquo;Strength doesn&apos;t come from what you can do. It comes from overcoming the things you once thought you couldn&apos;t.&rdquo;</Typography.Text>
-        </Space>
-      </Footer>
-    </Layout>
-  );
-}
