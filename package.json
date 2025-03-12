@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@ant-design/nextjs-registry": "^1.0.0",
     "antd": "^5.14.1",
     "axios": "^1.8.2",
@@ -20,16 +19,6 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.3.0",
     "redux-actions": "^3.0.3"
-||||||| 8f900d3
-    "@ant-design/nextjs-registry": "^1.0.0",
-    "antd": "^5.14.1",
-    "axios": "^1.8.2",
-    "next": "14.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "redux-actions": "^3.0.3"
-=======
->>>>>>> 9f73cfe891e3a815888bec3b0149147c1ad32420
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
