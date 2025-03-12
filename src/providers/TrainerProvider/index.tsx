@@ -1,3 +1,4 @@
+"use client";
 import { getAxiosInstance } from "../../utils/axiosInstance";
 import { INITIAL_STATE, ITrainer, TrainerActionContext, TrainerStateContext } from "./context";
 import { TrainerReducer } from "./reducer";

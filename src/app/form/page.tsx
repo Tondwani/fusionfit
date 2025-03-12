@@ -20,6 +20,7 @@ const FormPage = () => {
                 key: '1',
                 label: 'Trainer Register',
                 children: <TrainerRegister />,
+                
               },
               {
                 key: '2',

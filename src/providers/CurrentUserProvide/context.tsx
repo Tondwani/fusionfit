@@ -4,8 +4,12 @@ export interface ICurrentUser {
   id: string;
   name: string;
   email: string;
-  dateOfBirth: string;
+  role: string;
   contactNumber: string;
+  planType: string  
+  activeState: boolean;
+  trial: boolean;
+  date: string;
 }
 
 export interface ICurrentUserStateContext {
@@ -16,7 +20,7 @@ export interface ICurrentUserStateContext {
 }
 
 export interface ICurrentUserActionContext {
-  getCurrentUser: () => void;
+  getCurrentUser: () => Promise<void>;
   clearCurrentUser: () => void;
 }
 

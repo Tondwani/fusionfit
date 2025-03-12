@@ -1,3 +1,4 @@
+"use client";
 import { getAxiosInstance } from "@/utils/axiosInstance";
 import { INITIAL_CLIENT_STATE, ClientActionContext, ClientStateContext } from "./context";
 import { ClientReducer } from "./reducer";

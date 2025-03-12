@@ -46,13 +46,33 @@ function UserProfile() {
         </div>
         
         <div className="space-y-1">
+          <label className="text-sm text-gray-500">Role</label>
+          <p className="text-gray-700">{currentUser.role}</p>
+        </div>
+
+        <div className="space-y-1">
           <label className="text-sm text-gray-500">Contact Number</label>
           <p className="text-gray-700">{currentUser.contactNumber}</p>
         </div>
-        
+
         <div className="space-y-1">
-          <label className="text-sm text-gray-500">Date of Birth</label>
-          <p className="text-gray-700">{currentUser.dateOfBirth}</p>
+          <label className="text-sm text-gray-500">Status</label>
+          <p className="text-gray-700">{currentUser.activeState}</p>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm text-gray-500">Type</label>
+          <p className="text-gray-700">{currentUser.planType}</p>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm text-gray-500">Trial</label>
+          <p className="text-gray-700">{currentUser.contactNumber}</p>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm text-gray-500">Date</label>
+          <p className="text-gray-700">{currentUser.date}</p>
         </div>
       </div>
     </div>
