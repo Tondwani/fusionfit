@@ -5,5 +5,6 @@ export const getAxiosInstance = () =>
     baseURL: `${'https://body-vault-server-b9ede5286d4c.herokuapp.com'}`,
     headers: {
       "Content-Type": "application/json",
+    timeout: 10000,  
     },
   });

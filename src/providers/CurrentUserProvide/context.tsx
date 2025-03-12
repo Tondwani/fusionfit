@@ -1,15 +1,16 @@
 import { createContext } from "react";
 
 export interface ICurrentUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  contactNumber: string;
-  planType: string  
-  activeState: boolean;
-  trial: boolean;
-  date: string;
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    contactNumber: string;
+    planType: string;
+    activeState: boolean;
+    trial: boolean;
+    date: string;
+  
 }
 
 export interface ICurrentUserStateContext {
@@ -21,7 +22,6 @@ export interface ICurrentUserStateContext {
 
 export interface ICurrentUserActionContext {
   getCurrentUser: () => Promise<void>;
-  clearCurrentUser: () => void;
 }
 
 export const INITIAL_CURRENT_USER_STATE: ICurrentUserStateContext = {

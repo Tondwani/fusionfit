@@ -6,25 +6,41 @@ export enum CurrentUserActionEnums {
   GET_CURRENT_USER_SUCCESS = "GET_CURRENT_USER_SUCCESS",
   GET_CURRENT_USER_ERROR = "GET_CURRENT_USER_ERROR",
   CLEAR_CURRENT_USER = "CLEAR_CURRENT_USER",
+  SET_PENDING = "SET_PENDING",
+  SET_SUCCESS = "SET_SUCCESS",
+  SET_ERROR = "SET_ERROR",
 }
 
-export const currentUserReducer = handleActions<ICurrentUserStateContext, ICurrentUserStateContext>(
+export const currentUserReducer = handleActions<ICurrentUserStateContext, any>(
   {
     [CurrentUserActionEnums.GET_CURRENT_USER_PENDING]: (state, action) => ({
       ...state,
-      ...action.payload,
+      isPending: action.payload,
     }),
     [CurrentUserActionEnums.GET_CURRENT_USER_SUCCESS]: (state, action) => ({
       ...state,
-      ...action.payload,
+      currentUser: action.payload,
+      isSuccess: true,
     }),
     [CurrentUserActionEnums.GET_CURRENT_USER_ERROR]: (state, action) => ({
       ...state,
-      ...action.payload,
+      isError: action.payload,
     }),
-    [CurrentUserActionEnums.CLEAR_CURRENT_USER]: (state, action) => ({
+    [CurrentUserActionEnums.CLEAR_CURRENT_USER]: (state) => ({
       ...state,
-      ...action.payload,
+      currentUser: undefined,
+    }),
+    [CurrentUserActionEnums.SET_PENDING]: (state, action) => ({
+      ...state,
+      isPending: action.payload,
+    }),
+    [CurrentUserActionEnums.SET_SUCCESS]: (state, action) => ({
+      ...state,
+      isSuccess: action.payload,
+    }),
+    [CurrentUserActionEnums.SET_ERROR]: (state, action) => ({
+      ...state,
+      isError: action.payload,
     }),
   },
   INITIAL_CURRENT_USER_STATE

@@ -1,12 +1,15 @@
 import { ICurrentUser } from "./context";
 
-export const getCurrentUserAction = (currentUser: ICurrentUser) => ({
-  type: "GET_CURRENT_USER" as const,
-  payload: currentUser,
-});
 
-export const clearCurrentUserAction = () => ({
-  type: "CLEAR_CURRENT_USER" as const,
+export enum TrainerActionEnums {
+  getCurrentUserPending = "GET_CURRENT_USER_PENDING",
+  getCurrentUserSucess = "GET_CURRENT_USER_SUCCESS",
+  getCurrentUserError = "GET_CURRENT_USER_ERROR",
+}
+
+export const getCurrentUserAction = (currentUser: ICurrentUser) => ({
+  type: "GET_CURRENT_USER_SUCCESS" as const,
+  payload: currentUser,
 });
 
 export const setPendingAction = (isPending: boolean) => ({
