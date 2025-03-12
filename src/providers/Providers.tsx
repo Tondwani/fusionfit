@@ -1,20 +1,24 @@
 'use client';
 
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ClientProvider } from './ClientProvider';
-import { TrainerProvider } from './TrainerProvider';
-import { CurrentUserProvider } from './CurrentUserProvide';
+import { ClientProvider } from '@/providers/ClientMangementProvder';
+import { AuthProvider } from '@/providers/TrainerProvider';
+import { FoodItemProvider } from '@/providers/FoodItemProvider';
+import { MealPlanProvider } from '@/providers/MealPlanProvider';
+
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AntdRegistry>
-      <ClientProvider>
-        <TrainerProvider>
-          <CurrentUserProvider>
-          {children}
-          </CurrentUserProvider>
-        </TrainerProvider>
-      </ClientProvider>
+      <AuthProvider>
+        <ClientProvider>
+            <FoodItemProvider>
+              <MealPlanProvider>
+                {children}
+              </MealPlanProvider>
+            </FoodItemProvider>
+        </ClientProvider>
+      </AuthProvider>
     </AntdRegistry>
   );
 }

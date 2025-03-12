@@ -1,46 +1,90 @@
 import { createContext } from "react";
 
-// Interface defining the shape of a Trainer object
+// Trainer Interface
 export interface ITrainer {
+  id: string;
   name: string;
   email: string;
   password?: string;
   confirmPassword?: string;
   role: string;
   contactNumber: string;
-  planType: string  // Changed from PlanType
+  birthDate: string;
+  activeState: boolean;
+  planType: string;
+  trial: boolean;
+  policiesAccepted: boolean;
+  date: string;
+}
+
+// Registration Payload Interface
+export interface ITrainerRegistrationPayload {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: string;
+  contactNumber: string;
+  birthDate: string;
+  planType: string;
   activeState: boolean;
   trial: boolean;
   policiesAccepted: boolean;
 }
 
-// Interface defining the state shape for our Trainer context
-export interface ITrainerStateContext {
+// Login Payload Interface
+export interface ITrainerLoginPayload {
+  email: string;
+  password: string;
+}
+
+// State Interface
+export interface IAuthStateContext {
   isPending: boolean;
   isSuccess: boolean;
   isError: boolean;
-  trainer?: ITrainer;
+  currentUser?: ITrainer;
+  token?: string;
+  message?: string;
 }
 
-// Interface defining all actions that can be performed
-export interface ITrainerActionContext {
-  registerTrainer: (trainer: ITrainer) => void;
-  loginTrainer: (email: string, password: string) => void;
-}
-
-// Initial state object
-export const INITIAL_STATE: ITrainerStateContext = {
+// Initial State
+export const INITIAL_STATE: IAuthStateContext = {
   isPending: false,
   isSuccess: false,
   isError: false,
 };
 
-export const TrainerStateContext =
-  createContext<ITrainerStateContext>(INITIAL_STATE);
+// Actions Interface
+export interface IAuthActionContext {
+  registerTrainer: (trainer: ITrainerRegistrationPayload) => Promise<void>;
+  loginTrainer: (credentials: ITrainerLoginPayload) => Promise<void>;
+  getCurrentUser: () => Promise<void>;
+  logout: () => void;
+}
 
-export const TrainerActionContext =
-  createContext<ITrainerActionContext>(undefined);
+// Context for Auth State
+export const AuthStateContext = createContext<IAuthStateContext>(INITIAL_STATE);
 
-  // export const TrainerActionContext =
-  // createContext<ITrainerActionContext>({registerTrainer:() => {},
-  // });
+// Context for Auth Actions
+export const AuthActionContext = createContext<IAuthActionContext | undefined>(undefined);
+
+// API Configuration
+export const API_CONFIG = {
+  endpoints: {
+    register: "/api/users/register",
+    login: "/api/users/login",
+    currentUser: "/api/users/current",
+  },
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <jwt-token>",
+  },
+};
+
+// Response Interface
+export interface IApiResponse {
+  status: number;
+  message: string;
+  data?: any;
+}

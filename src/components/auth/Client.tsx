@@ -1,12 +1,13 @@
-import { useClientActions, useClientState } from "@/providers/ClientProvider";
+import { useClientActions, useClientState } from "@/providers/ClientMangementProvder";
 import { Form, Input, Button, Typography, message } from "antd";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { IClientLoginPayload } from "@/providers/ClientMangementProvder/context";
 
 const { Title } = Typography;
 
 const LoginForm = () => {
-    const { login } = useClientActions();
+    const { loginClient } = useClientActions();
     const { isPending, isSuccess, isError } = useClientState();
     const router = useRouter();
 
@@ -19,8 +20,19 @@ const LoginForm = () => {
         }
     }, [isSuccess, isError, router]);
 
-    const onFinish = (values: { client: string; password: string }) => {
-        login(values.client, values.password);
+    const onFinish = async (values: { email: string; password: string }) => {
+        try {
+            const loginPayload: IClientLoginPayload = {
+                email: values.email,
+                password: values.password
+            };
+            
+            await loginClient(loginPayload);
+            // The useEffect will handle redirection on success
+        } catch (error) {
+            console.error("Login error:", error);
+            // The useEffect will handle error message
+        }
     };
 
     return (
@@ -28,11 +40,14 @@ const LoginForm = () => {
             <Title level={2}>Client Login</Title>
             <Form layout="vertical" onFinish={onFinish}>
                 <Form.Item
-                    label="Username"
-                    name="client"
-                    rules={[{ required: true, message: "Please enter your username!" }]}
+                    label="Email"
+                    name="email"
+                    rules={[
+                        { required: true, message: "Please enter your email!" },
+                        { type: "email", message: "Please enter a valid email!" }
+                    ]}
                 >
-                    <Input placeholder="Enter your username" />
+                    <Input placeholder="Enter your email" />
                 </Form.Item>
 
                 <Form.Item

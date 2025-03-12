@@ -1,33 +1,64 @@
 import { handleActions } from "redux-actions";
-import { INITIAL_STATE, ITrainerStateContext } from "./context";
-import { TrainerActionEnums } from "./actions";
+import { INITIAL_STATE, IAuthStateContext } from "./context";
+import { AuthActionEnum } from "./action";
 
-export const TrainerReducer = handleActions<ITrainerStateContext, ITrainerStateContext>(
+// Auth Reducer
+export const AuthReducer = handleActions<IAuthStateContext, any>(
   {
-    [TrainerActionEnums.REGISTER_PENDING]: (state, action) => ({
+    // Register Trainer
+    [AuthActionEnum.registerTrainerPending]: (state, action) => ({
       ...state,
       ...action.payload,
     }),
-    [TrainerActionEnums.REGISTER_SUCCESS]: (state, action) => ({
+    [AuthActionEnum.registerTrainerSuccess]: (state, action) => ({
       ...state,
       ...action.payload,
     }),
-    [TrainerActionEnums.REGISTER_ERROR]: (state, action) => ({
+    [AuthActionEnum.registerTrainerError]: (state, action) => ({
       ...state,
       ...action.payload,
     }),
-    [TrainerActionEnums.LOGIN_PENDING]: (state, action) => ({
+
+    // Login Trainer
+    [AuthActionEnum.loginTrainerPending]: (state, action) => ({
       ...state,
       ...action.payload,
     }),
-    [TrainerActionEnums.LOGIN_SUCCESS]: (state, action) => ({
+    [AuthActionEnum.loginTrainerSuccess]: (state, action) => ({
       ...state,
       ...action.payload,
     }),
-    [TrainerActionEnums.LOGIN_ERROR]: (state, action) => ({
+    [AuthActionEnum.loginTrainerError]: (state, action) => ({
+      ...state,
+      ...action.payload,
+    }),
+
+    // Get Current User
+    [AuthActionEnum.getCurrentUserPending]: (state, action) => ({
+      ...state,
+      ...action.payload,
+    }),
+    [AuthActionEnum.getCurrentUserSuccess]: (state, action) => ({
+      ...state,
+      ...action.payload,
+    }),
+    [AuthActionEnum.getCurrentUserError]: (state, action) => ({
+      ...state,
+      ...action.payload,
+    }),
+    
+    // Logout
+    [AuthActionEnum.logout]: (state, action) => ({
       ...state,
       ...action.payload,
     }),
   },
   INITIAL_STATE
 );
+
+// API Endpoint Constants
+export const API_ENDPOINTS = {
+  REGISTER_TRAINER: '/api/users/register',
+  LOGIN_TRAINER: '/api/users/login',
+  CURRENT_USER: '/api/users/current'
+};

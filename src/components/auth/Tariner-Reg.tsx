@@ -1,11 +1,11 @@
 import { Form, Input, Button, Switch, Alert, Select } from "antd";
-import { useTrainerActions } from "@/providers/TrainerProvider";
+import { useAuthActions } from "@/providers/TrainerProvider";
 import { useState } from "react";
 
 import PolicySection from "@/components/policy";
 
 const TrainerRegister = () => {
-  const { registerTrainer } = useTrainerActions();
+  const { registerTrainer } = useAuthActions();
   const [hasReadPolicies, setHasReadPolicies] = useState(false);
 
   const onFinish = async (values) => {
@@ -18,12 +18,13 @@ const TrainerRegister = () => {
       email: values.email,
       password: values.password,
       confirmPassword: values.confirmPassword,
-      role: "admin", // Default role
+      role: values.role || "trainer", 
       contactNumber: values.contactNumber || "",
-      planType: values.planType, 
+      planType: values.planType,
       activeState: false,
       trial: false,
-      policiesAccepted: hasReadPolicies
+      policiesAccepted: hasReadPolicies,
+      birthDate: "values.birthDate || new Date().toISOString().split('T')[0]"
     });
     
   };
