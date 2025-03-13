@@ -57,9 +57,9 @@ export const INITIAL_STATE: IAuthStateContext = {
 
 // Actions Interface
 export interface IAuthActionContext {
-  registerTrainer: (trainer: ITrainerRegistrationPayload) => Promise<void>;
-  loginTrainer: (credentials: ITrainerLoginPayload) => Promise<void>;
-  getCurrentUser: () => Promise<void>;
+  registerTrainer: (trainer: ITrainerRegistrationPayload) => Promise<any>;
+  loginTrainer: (credentials: ITrainerLoginPayload) => Promise<any>;
+  getCurrentUser: () => Promise<any>;
   logout: () => void;
 }
 

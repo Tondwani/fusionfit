@@ -43,7 +43,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
       // If token exists, try to get current user data
-      getCurrentUser();
+      getCurrentUser().catch(() => {
+        console.warn("Could not load user details on init, but token exists");
+      });
     }
   }, []);
   
@@ -63,16 +65,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       const trainer: ITrainer = response.data.data;
+      const token = response.data.data.token; // Make sure your API returns a token on registration
+
+      // Save token immediately on successful registration
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token);
+      }
+      
       dispatch(registerTrainerSuccess(trainer, response.data.message));
-     
+      
+      // Get current user data after successful registration
+      if (token) {
+        try {
+          await getCurrentUser();
+        } catch (error) {
+          console.warn("Could not fetch user details after registration, but registration was successful");
+        }
+      }
+      
+      return trainer;
     } catch (error) {
-      console.error(error);
-      dispatch(registerTrainerError("Registration failed"));
+      console.error("Registration error:", error);
+      dispatch(registerTrainerError(error.response?.data?.message || "Registration failed"));
       throw error;
     }
   };
   
-  // Login trainer 
+  // Login trainer with improved error handling
   const loginTrainer = async(credentials: ITrainerLoginPayload) => {
     dispatch(loginTrainerPending());
     try {
@@ -83,68 +102,146 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       const token = response.data.data.token;
-      dispatch(loginTrainerSuccess(token, response.data.message));
+      const userData = response.data.data.user; // Check if user data is included in login response
+      
+      // Validate token exists before proceeding
+      if (!token) {
+        throw new Error("No token received from server");
+      }
+      
       // Save token to localStorage for future authenticated requests
       localStorage.setItem(TOKEN_KEY, token);
       
-      // After successful login, fetch current user data
-      await getCurrentUser();
+      dispatch(loginTrainerSuccess(token, response.data.message));
+      
+      // If the login response already includes user data, use it directly
+      if (userData) {
+        dispatch(getCurrentUserSuccess(userData, "User data from login response"));
+        return { token, user: userData };
+      }
+      
+      // Only call getCurrentUser if we don't have user data yet
+      try {
+        await getCurrentUser();
+      } catch (userError) {
+        console.warn("Could not fetch user details, but login was successful");
+        
+        // Try to extract basic user info from token if it's a JWT
+        try {
+          const base64Url = token.split('.')[1];
+          if (base64Url) {
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const tokenData = JSON.parse(window.atob(base64));
+            
+            if (tokenData.user || tokenData.name || tokenData.email) {
+              // Create minimal user object from token data
+              const minimalUser = {
+                id: tokenData.sub || tokenData.id || 'unknown',
+                name: tokenData.name || tokenData.user?.name || credentials.email.split('@')[0] || 'User',
+                email: tokenData.email || credentials.email,
+                role: tokenData.role || tokenData.user?.role || 'trainer',
+                // Set default values for required fields
+                contactNumber: tokenData.contactNumber || '',
+                birthDate: tokenData.birthDate || '',
+                activeState: true,
+                planType: tokenData.planType || 'basic',
+                trial: false,
+                policiesAccepted: true,
+                date: new Date().toISOString()
+              };
+              
+              dispatch(getCurrentUserSuccess(minimalUser, "Basic user data extracted from token"));
+            }
+          }
+        } catch (tokenError) {
+          console.warn("Could not extract user data from token:", tokenError);
+        }
+      }
       
       return token;
     } catch (error) {
-      console.error(error);
-      dispatch(loginTrainerError("Login failed"));
+      console.error("Login error:", error);
+      dispatch(loginTrainerError(error.response?.data?.message || "Login failed"));
       throw error;
     }
   };
   
-  // Get current user 
+  // Get current user with improved error handling
   const getCurrentUser = async() => {
     const token = localStorage.getItem(TOKEN_KEY);
     
-    console.log("Token exists:", !!token);
-    
     if (!token) {
-      console.error("Debug: No authentication token found in localStorage");
+      console.error("No authentication token found in localStorage");
       dispatch(getCurrentUserError("No authentication token found"));
-      return; 
+      return null; 
     }
     
     dispatch(getCurrentUserPending());
     try {
-      // Debug: Log request attempt
-      console.log("Attempting to fetch current user data");
-      console.log("Auth headers:", getAuthHeaders());
+      console.log("Attempting to access endpoint:", API_ENDPOINTS.getCurrentUser);
       
       const response = await instance.get(API_ENDPOINTS.getCurrentUser, {
         headers: getAuthHeaders()
       });
       
-      // Debug: Log successful response
-      console.log("Current user API response:", response.data);
-      
       const trainer: ITrainer = response.data.data;
-      dispatch(getCurrentUserSuccess(trainer, response.data.message));
       
-      // Debug: Log successful trainer data
-      console.log("Successfully fetched trainer data:", trainer);
+      // Validate trainer data
+      if (!trainer || !trainer.id) {
+        throw new Error("Invalid user data received from server");
+      }
+      
+      dispatch(getCurrentUserSuccess(trainer, response.data.message));
+      return trainer;
       
     } catch (error) {
-      // Enhanced error logging
       console.error("Error fetching current user:", error);
-      console.error("Error response data:", error.response?.data);
-      console.error("Error status:", error.response?.status);
-      console.error("Error response headers:", error.response?.headers);
       
-      dispatch(getCurrentUserError(
-        error.response?.data?.message || "Failed to get current user"
-      ));
+      // Try to recover by extracting user data from JWT token if endpoint doesn't exist
+      if (error.response?.status === 404) {
+        try {
+          // If you have JWT token, you could try to decode it to get basic user info
+          const base64Url = token.split('.')[1];
+          if (base64Url) {
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const tokenData = JSON.parse(window.atob(base64));
+            
+            if (tokenData.user || tokenData.name || tokenData.email) {
+              // Create minimal user object from token data
+              const minimalUser = {
+                id: tokenData.sub || tokenData.id || 'unknown',
+                name: tokenData.name || tokenData.user?.name || 'User',
+                email: tokenData.email || tokenData.user?.email || 'user@example.com',
+                role: tokenData.role || tokenData.user?.role || 'trainer',
+                // Set default values for required fields
+                contactNumber: tokenData.contactNumber || '',
+                birthDate: tokenData.birthDate || '',
+                activeState: true,
+                planType: tokenData.planType || 'basic',
+                trial: false,
+                policiesAccepted: true,
+                date: new Date().toISOString()
+              };
+              
+              dispatch(getCurrentUserSuccess(minimalUser, "User data extracted from token"));
+              return minimalUser;
+            }
+          }
+        } catch (tokenError) {
+          console.error("Failed to extract user data from token:", tokenError);
+        }
+      }
       
-      // Log token before removal
-      console.warn("Removing potentially invalid token from localStorage");
+      // If we couldn't recover, proceed with normal error handling
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem(TOKEN_KEY);
+        dispatch(logout());
+      } else {
+        dispatch(getCurrentUserError(
+          error.response?.data?.message || "Failed to get current user"
+        ));
+      }
       
-      // If we can't get the current user, the token might be invalid
-      localStorage.removeItem(TOKEN_KEY);
       throw error;
     }
   };

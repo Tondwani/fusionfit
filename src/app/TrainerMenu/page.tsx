@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Layout, Menu, Card, Row, Col, Typography, List, Avatar, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Layout, Menu, Card, Row, Col, Typography, List, Avatar, Spin, message, Alert, Button } from 'antd';
 import { UserOutlined, TeamOutlined, FileOutlined, AppstoreOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useAuthState, useAuthActions } from '../../providers/TrainerProvider';
+import { useRouter } from 'next/navigation';
 
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
@@ -11,10 +12,88 @@ const { Title, Text } = Typography;
 const TrainerDashboard: React.FC = () => {
   const { currentUser, isPending } = useAuthState();
   const { getCurrentUser, logout } = useAuthActions();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCurrentUser();
+    const checkAuth = async () => {
+      try {
+        setLoading(true);
+        
+        // Check if we have a token first
+        const hasToken = localStorage.getItem("auth_token");
+        if (!hasToken) {
+          throw new Error("No authentication token");
+        }
+        
+        // Try to get user data
+        try {
+          await getCurrentUser();
+        } catch (error) {
+          console.warn("Could not fetch user details, using minimal profile");
+          // If getCurrentUser fails but we have a token, we can show a minimal dashboard
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error("Authentication check failed:", error);
+        message.error("Please log in to access the dashboard");
+        router.push('/login');
+      }
+    };
+    
+    checkAuth();
   }, []);
+
+  // If we're still checking auth status or explicitly loading, show spinner
+  if (loading || isPending) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" tip="Loading dashboard..." />
+      </div>
+    );
+  }
+
+  // renders to handle missing user data
+  if (!currentUser) {
+    return (
+      <Layout style={{ minHeight: '100vh' }}>
+        <Content style={{ padding: 24 }}>
+          <Alert
+            message="Limited Access Mode"
+            description="We're having trouble loading your complete profile data, but you can still access the dashboard with limited functionality."
+            type="warning"
+            showIcon
+          />
+          {/* Show minimal dashboard */}
+          <div style={{ marginTop: 24 }}>
+            <Title level={3}>Trainer Dashboard</Title>
+            <Text>Welcome to the Nutrition App. You're in limited access mode.</Text>
+
+            <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+              <Col xs={24}>
+                <Card>
+                  <Card.Meta
+                    title="Limited Functionality"
+                    description="Some features may be unavailable until we can load your complete profile."
+                  />
+                </Card>
+              </Col>
+            </Row>
+
+            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'space-between' }}>
+              <Button type="primary" onClick={() => router.push('/login')}>
+                Return to Login
+              </Button>
+              <Button onClick={() => location.reload()}>
+                Retry Loading Profile
+              </Button>
+            </div>
+          </div>
+        </Content>
+      </Layout>
+    );
+  }
 
   const trainerFeatures = [
     {
@@ -37,13 +116,15 @@ const TrainerDashboard: React.FC = () => {
     }
   ];
 
-  if (isPending) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin size="large" tip="Loading dashboard..." />
-      </div>
-    );
-  }
+  const handleMenuClick = (path) => {
+    router.push(path);
+  };
+
+  const handleLogout = () => {
+    logout();
+    message.success("You have been logged out");
+    router.push('/login');
+  };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -61,17 +142,17 @@ const TrainerDashboard: React.FC = () => {
             Dashboard
           </Menu.Item>
           <Menu.SubMenu key="features" title="Features" icon={<AppstoreOutlined />}>
-            <Menu.Item key="clients" icon={<TeamOutlined />}>
+            <Menu.Item key="clients" icon={<TeamOutlined />} onClick={() => handleMenuClick('/clients')}>
               Manage Clients
             </Menu.Item>
-            <Menu.Item key="mealplans" icon={<FileOutlined />}>
+            <Menu.Item key="mealplans" icon={<FileOutlined />} onClick={() => handleMenuClick('/meal-plans')}>
               Meal Plans
             </Menu.Item>
-            <Menu.Item key="fooditems" icon={<AppstoreOutlined />}>
+            <Menu.Item key="fooditems" icon={<AppstoreOutlined />} onClick={() => handleMenuClick('/food-items')}>
               Food Items
             </Menu.Item>
           </Menu.SubMenu>
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => logout()}>
+          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
           </Menu.Item>
         </Menu>
@@ -99,7 +180,15 @@ const TrainerDashboard: React.FC = () => {
                 <Col xs={24} sm={12} md={8} key={index}>
                   <Card 
                     hoverable
-                    actions={[<a key="go">Go to {feature.title}</a>]}
+                    onClick={() => handleMenuClick(feature.path)}
+                    actions={[
+                      <a key="go" onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuClick(feature.path);
+                      }}>
+                        Go to {feature.title}
+                      </a>
+                    ]}
                   >
                     <Card.Meta
                       avatar={feature.icon}
