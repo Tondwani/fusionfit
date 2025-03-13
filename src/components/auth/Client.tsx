@@ -1,7 +1,7 @@
 import { useClientActions, useClientState } from "@/providers/ClientMangementProvder";
 import { Form, Input, Button, Typography, message } from "antd";
 import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { IClientLoginPayload } from "@/providers/ClientMangementProvder/context";
 
 const { Title } = Typography;
@@ -14,7 +14,7 @@ const LoginForm = () => {
     useEffect(() => {
         if (isSuccess) {
             message.success("Login successful!");
-            router.push("/dashboard"); // Redirect after successful login
+            router.push("/ClientMenu"); // Redirect after successful login
         } else if (isError) {
             message.error("Login failed. Please try again.");
         }

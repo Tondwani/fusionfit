@@ -12,7 +12,10 @@ import {
   getFoodItemsByCategorySuccess,
   getFoodItemsError,
   getFoodItemsPending,
-  getFoodItemsSuccess
+  getFoodItemsSuccess,
+  searchFoodItemsError,
+  searchFoodItemsPending,
+  searchFoodItemsSuccess
 } from "./action";
 import {
   FoodByCategoryActionContext,
@@ -33,6 +36,9 @@ const API_ENDPOINTS = {
   searchFoodItems: "/api/food/search"
 };
 
+// Token storage key 
+const TOKEN_KEY = "auth_token";
+
 // Available food categories 
 export const FOOD_CATEGORIES = ["veg", "meat", "dairy", "fruit", "bnl", "grains"];
 
@@ -41,23 +47,34 @@ export const FoodItemProvider = ({ children }: { children: React.ReactNode }) =>
   const [state, dispatch] = useReducer(FoodItemReducer, INITIAL_STATE);
   const instance = getAxiosInstance();
   
-
+  // Get auth headers function
   const getAuthHeaders = () => ({
-    'Authorization': 'Bearer <jwt-token>'
+    'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY)}`
   });
   
   // Get all food items
   const getFoodItems = async() => {
     dispatch(getFoodItemsPending());
     try {
+      console.log("Fetching all food items...");
       const response = await instance.get(API_ENDPOINTS.getAllFoodItems, { 
         headers: getAuthHeaders() 
       });
-      dispatch(getFoodItemsSuccess(response.data.data, response.data.message));
-      return response.data;
+      
+      console.log("Food items response:", response.data);
+      const foodItems = response.data.data || [];
+      
+      dispatch(getFoodItemsSuccess(foodItems, response.data.message || "Food items fetched successfully"));
+      return foodItems;
     } catch (error) {
-      console.error(error);
-      dispatch(getFoodItemsError("Failed to fetch food items"));
+      console.error("Error fetching food items:", error);
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        dispatch(getFoodItemsError("Authentication error. Please log in again."));
+      } else {
+        dispatch(getFoodItemsError(error.response?.data?.message || "Failed to fetch food items"));
+      }
+      
       throw error;
     }
   };
@@ -66,14 +83,25 @@ export const FoodItemProvider = ({ children }: { children: React.ReactNode }) =>
   const getFoodItemsByCategory = async(category: string) => {
     dispatch(getFoodItemsByCategoryPending());
     try {
+      console.log(`Fetching ${category} food items...`);
       const response = await instance.get(`${API_ENDPOINTS.getFoodItemsByCategory}/${category}`, { 
         headers: getAuthHeaders() 
       });
-      dispatch(getFoodItemsByCategorySuccess(response.data.data, response.data.message));
-      return response.data;
+      
+      console.log(`${category} food items response:`, response.data);
+      const foodItems = response.data.data || [];
+      
+      dispatch(getFoodItemsByCategorySuccess(foodItems, response.data.message || `${category} food items fetched successfully`));
+      return foodItems;
     } catch (error) {
-      console.error(error);
-      dispatch(getFoodItemsByCategoryError("Failed to fetch food items by category"));
+      console.error(`Error fetching ${category} food items:`, error);
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        dispatch(getFoodItemsByCategoryError("Authentication error. Please log in again."));
+      } else {
+        dispatch(getFoodItemsByCategoryError(error.response?.data?.message || `Failed to fetch ${category} food items`));
+      }
+      
       throw error;
     }
   };
@@ -81,7 +109,19 @@ export const FoodItemProvider = ({ children }: { children: React.ReactNode }) =>
   // Create food item 
   const createFoodItem = async(foodItem: ICreateFoodItemPayload) => {
     dispatch(createFoodItemPending());
+    
+    // Get the auth token
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) {
+      const errMsg = "Authentication token missing. Please log in again.";
+      dispatch(createFoodItemError(errMsg));
+      throw new Error(errMsg);
+    }
+    
     try {
+      console.log("Creating food item with data:", foodItem);
+      console.log("Using auth headers:", getAuthHeaders());
+      
       const response = await instance.post(API_ENDPOINTS.createFoodItem, foodItem, { 
         headers: {
           ...getAuthHeaders(),
@@ -89,37 +129,71 @@ export const FoodItemProvider = ({ children }: { children: React.ReactNode }) =>
         } 
       });
       
+      console.log("Food item creation response:", response.data);
+      
+      // Extract the ID from various possible response formats
+      let foodItemId;
+      
+      if (response.data && response.data.data && response.data.data.id) {
+        foodItemId = response.data.data.id;
+      } else if (response.data && response.data.id) {
+        foodItemId = response.data.id;
+      } else if (response.data && response.data._id) {
+        foodItemId = response.data._id;
+      } else if (response.data && response.data.data && response.data.data._id) {
+        foodItemId = response.data.data._id;
+      } else {
+        foodItemId = `food-${new Date().getTime()}-${Math.random().toString(36).substr(2, 9)}`;
+      }
+      
       // Create a complete IFoodItem with the response data
       const newFoodItem: IFoodItem = {
-        id: response.data.id || new Date().getTime().toString(),
+        id: foodItemId,
         ...foodItem,
         date: new Date().toISOString()
       };
       
-      dispatch(createFoodItemSuccess(newFoodItem, response.data.message || "Created Successfully"));
-      return response.data;
+      dispatch(createFoodItemSuccess(newFoodItem, response.data.message || "Food item created successfully"));
+      return newFoodItem;
     } catch (error) {
-      console.error(error);
-      dispatch(createFoodItemError("Failed to create food item"));
+      console.error("Error creating food item:", error);
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        dispatch(createFoodItemError("Authentication error. Please log in again."));
+      } else {
+        dispatch(createFoodItemError(error.response?.data?.message || "Failed to create food item"));
+      }
+      
       throw error;
     }
   };
   
-  // Search food items (Image 4)
-  // const searchFoodItems = async(searchTerm: string) => {
-  //   dispatch(searchFoodItemsPending());
-  //   try {
-  //     const response = await instance.get(`${API_ENDPOINTS.searchFoodItems}/${searchTerm}`, { 
-  //       headers: getAuthHeaders() 
-  //     });
-  //     dispatch(searchFoodItemsSuccess(response.data.data, response.data.message));
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error(error);
-  //     dispatch(searchFoodItemsError("Failed to search food items"));
-  //     throw error;
-  //   }
-  // };
+  // Search food items
+  const searchFoodItems = async(searchTerm: string) => {
+    dispatch(searchFoodItemsPending());
+    try {
+      console.log(`Searching for food items with term: ${searchTerm}`);
+      const response = await instance.get(`${API_ENDPOINTS.searchFoodItems}/${searchTerm}`, { 
+        headers: getAuthHeaders() 
+      });
+      
+      console.log("Search results:", response.data);
+      const foodItems = response.data.data || [];
+      
+      dispatch(searchFoodItemsSuccess(foodItems, response.data.message || "Search completed"));
+      return foodItems;
+    } catch (error) {
+      console.error("Error searching food items:", error);
+      
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        dispatch(searchFoodItemsError("Authentication error. Please log in again."));
+      } else {
+        dispatch(searchFoodItemsError(error.response?.data?.message || "Failed to search food items"));
+      }
+      
+      throw error;
+    }
+  };
   
   return (
     <FoodItemStateContext.Provider value={state}>
@@ -127,7 +201,7 @@ export const FoodItemProvider = ({ children }: { children: React.ReactNode }) =>
         getFoodItems,
         getFoodItemsByCategory,
         createFoodItem,
-        // searchFoodItems
+        searchFoodItems
       }}>
         {children}
       </FoodItemActionContext.Provider>
@@ -144,7 +218,7 @@ export const FoodByCategoryProvider = ({ children }: { children: React.ReactNode
     dispatch(getFoodByCategoryPending());
     try {
       const response = await instance.get(`${API_ENDPOINTS.getFoodItemsByCategory}/${category}`, { 
-        headers: { 'Authorization': 'Bearer <jwt-token>' } 
+        headers: { 'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY)}` } 
       });
       dispatch(getFoodByCategorySuccess(response.data.data, response.data.message));
       return response.data;

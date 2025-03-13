@@ -30,14 +30,18 @@ const API_ENDPOINTS = {
   createClient: "/api/client"
 };
 
+// Token storage key (use the same key as auth provider)
+const TOKEN_KEY = "auth_token";
+
 // Client Provider Component
 export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(ClientReducer, INITIAL_STATE);
   const instance = getAxiosInstance();
   
+  
   // Get auth headers function
   const getAuthHeaders = () => ({
-    'Authorization': 'Bearer <jwt-token>'
+    'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY)}`
   });
   
   // Register client 
@@ -52,10 +56,11 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
       
       const client: IClient = response.data.data;
       dispatch(registerClientSuccess(client, response.data.message));
+      return client;
       
     } catch (error) {
-      console.error(error);
-      dispatch(registerClientError("Registration failed"));
+      console.error("Client registration error:", error);
+      dispatch(registerClientError(error.response?.data?.message || "Registration failed"));
       throw error;
     }
   };
@@ -70,14 +75,22 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
         }
       });
       
-      const token = response.data.data.token;
-      dispatch(loginClientSuccess(token, response.data.message));
-      // Save token to localStorage or sessionStorage for future authenticated requests
-      localStorage.setItem('token', token);
+      // Handle different response formats
+      const token = response.data.data?.token || response.data.token;
+      
+      if (!token) {
+        throw new Error("No token received from server");
+      }
+      
+      // Save token to localStorage
+      localStorage.setItem(TOKEN_KEY, token);
+      
+      dispatch(loginClientSuccess(token, response.data.message || "Login successful"));
+      
       return token;
     } catch (error) {
-      console.error(error);
-      dispatch(loginClientError("Login failed"));
+      console.error("Client login error:", error);
+      dispatch(loginClientError(error.response?.data?.message || "Login failed"));
       throw error;
     }
   };
@@ -85,7 +98,19 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
   // Create client 
   const createClient = async(clientData: ICreateClientPayload) => {
     dispatch(createClientPending());
+    
+    // Get the auth token
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) {
+      const errMsg = "Authentication token missing. Please log in again.";
+      dispatch(createClientError(errMsg));
+      throw new Error(errMsg);
+    }
+    
     try {
+      console.log("Creating client with data:", clientData);
+      console.log("Using auth headers:", getAuthHeaders());
+      
       const response = await instance.post(API_ENDPOINTS.createClient, clientData, {
         headers: {
           ...getAuthHeaders(),
@@ -93,9 +118,11 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
         }
       });
       
+      console.log("Client creation response:", response.data);
+      
       // Create a complete IClient object with the response data
       const newClient: IClient = {
-        id: response.data.id || new Date().getTime().toString(),
+        id: response.data.data?.id || response.data.id || new Date().getTime().toString(),
         name: clientData.fullName,
         email: clientData.email,
         contactNumber: clientData.contactNumber,
@@ -109,9 +136,18 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
       };
       
       dispatch(createClientSuccess(newClient, response.data.message || "Created Successfully"));
+      return newClient;
+      
     } catch (error) {
-      console.error(error);
-      dispatch(createClientError("Failed to create client"));
+      console.error("Client creation error:", error);
+      
+      // Check for specific error types
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        dispatch(createClientError("Authentication error. Please log in again."));
+      } else {
+        dispatch(createClientError(error.response?.data?.message || "Failed to create client"));
+      }
+      
       throw error;
     }
   };
@@ -151,9 +187,5 @@ export const useClientActions = () => {
 
 // Export a simple utility function to check if a user is logged in
 export const isAuthenticated = () => {
-  return !!localStorage.getItem('token');
+  return !!localStorage.getItem(TOKEN_KEY);
 };
-
-
-
-
