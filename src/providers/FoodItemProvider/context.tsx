@@ -52,11 +52,11 @@ export const INITIAL_STATE: IFoodItemStateContext = {
 
 // Actions Interface
 export interface IFoodItemActionContext {
-  getFoodItems: () => Promise<void>;
-  getFoodItemsByCategory: (category: string) => Promise<void>;
-  createFoodItem: (foodItem: ICreateFoodItemPayload) => Promise<void>;
+  getFoodItems: () => Promise<IFoodItem[]>;
+  getFoodItemsByCategory: (category: string) => Promise<IFoodItem[]>;
+  createFoodItem: (foodItem: ICreateFoodItemPayload) => Promise<IFoodItem>;
+  searchFoodItems: (searchTerm: string) => Promise<IFoodItem[]>;
 }
-
 // Context for Food Item State
 export const FoodItemStateContext = createContext<IFoodItemStateContext>(INITIAL_STATE);
 

@@ -44,6 +44,7 @@ export interface ICreateClientPayload {
   sex: string;
   birthDate: string;
   trialerId: string;
+  
 }
 
 // State Interface
@@ -66,9 +67,9 @@ export const INITIAL_STATE: IClientStateContext = {
 
 // Actions Interface
 export interface IClientActionContext {
-  registerClient: (client: IClientRegistrationPayload) => Promise<void>;
-  loginClient: (credentials: IClientLoginPayload) => Promise<void>;
-  createClient: (client: ICreateClientPayload) => Promise<void>;
+  registerClient: (client: IClientRegistrationPayload) => Promise<IClient>;
+  loginClient: (credentials: IClientLoginPayload) => Promise<string>;
+  createClient: (client: ICreateClientPayload) => Promise<IClient>;
 }
 
 // Context for Client State

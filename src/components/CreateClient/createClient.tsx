@@ -50,7 +50,8 @@ const ClientCreateForm: React.FC = () => {
           trialerId: ""
         });
       } catch (error) {
-        message.error("Failed to create client");
+        console.error("Client creation error:", error);
+        message.error(error.response?.data?.message || "Failed to create client");
         setError("Failed to create client. Please try again.");
       } finally {
         setLoading(false);
@@ -64,7 +65,7 @@ const ClientCreateForm: React.FC = () => {
   return (
     <div style={{ backgroundColor: "#F5F5F5", padding: "2rem" }}>
       <Row justify="center">
-        <Col xs={24} sm={24} md={16} lg={12}>
+        <Col xs={24} sm={24} md={20} lg={20}>
           <Card
             title="Create New Client"
             style={{
@@ -131,9 +132,9 @@ const ClientCreateForm: React.FC = () => {
                       onChange={(value) => handleSelectChange("sex", value)}
                       value={formData.sex || undefined}
                     >
-                      <select value="male">Male</select>
-                      <select value="female">Female</select>
-                      <select value="other">Other</select>
+                      <Select.Option value="male">Male</Select.Option>
+                      <Select.Option value="female">Female</Select.Option>
+                      <Select.Option value="other">Other</Select.Option>
                     </Select>
                   </Form.Item>
                 </Col>

@@ -2,7 +2,7 @@ import { Form, Input, Button, Switch, Alert, Select } from "antd";
 import { useAuthActions } from "@/providers/TrainerProvider";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import PolicySection from "@/components/policy";
+// import PolicySection from "@/components/policy";
 
 const TrainerRegister = () => {
   const { registerTrainer } = useAuthActions();
@@ -51,7 +51,7 @@ const TrainerRegister = () => {
 
   return (
     <div>
-      <PolicySection />
+      {/* <PolicySection /> */}
       
       <Form name="register" onFinish={onFinish} layout="vertical">
         <Form.Item
