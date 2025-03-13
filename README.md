@@ -1,6 +1,7 @@
-Personal Trainer Platform
+*********************************************************************Personal Trainer Platform*******************************************************************************
 This repository contains a Next.js frontend application for a Personal Trainer Platform where trainers can manage clients and meal plans.
-Overview
+
+**********************************************************************Overview********************************************************************************************8
 FusionFit is a comprehensive Next.js application designed to connect personal trainers with their clients through a feature-rich platform for nutrition planning and fitness management. The system enables efficient client management, customized meal planning, and detailed food item tracking.
 
 Authentication for trainers and clients
