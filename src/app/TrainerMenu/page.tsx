@@ -7,10 +7,8 @@ import { useAuthState, useAuthActions } from '../../providers/TrainerProvider';
 import { useRouter } from 'next/navigation';
 import ClientCreateForm from '@/components/CreateClient/createClient';
 import { ClientProvider } from '@/providers/ClientMangementProvder';
-import {} from '@/components/FoodItems/CreateFood';
-import {} from '@/components/FoodItems/FoodCatergory';
-import {} from '@/components/FoodItems/foodItemsList';
-import {} from '@/components/FoodItems/SearchFood';
+import FoodItems from '@/components/FoodItems/page';
+import { FoodItemProvider } from '@/providers/FoodItemProvider';
 
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
@@ -21,6 +19,12 @@ const TrainerDashboard: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [showClientForm, setShowClientForm] = useState(false);
+  const [showFoodItems, setShowFoodItems] = useState(false);
+
+  // Add a function to toggle the food items display
+  const toggleFoodItems = () => {
+    setShowFoodItems(!showFoodItems);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -119,7 +123,7 @@ const TrainerDashboard: React.FC = () => {
       title: 'Food Item Management',
       description: 'Create and manage food items for meal plans',
       icon: <AppstoreOutlined style={{ fontSize: 24 }} />,
-      path: '/food-management'
+      path: '/components/food-items'
     }
   ];
 
@@ -130,7 +134,7 @@ const TrainerDashboard: React.FC = () => {
   const handleLogout = () => {
     logout();
     message.success("You have been logged out");
-    router.push('/app/page');
+    router.push('/app');
   };
 
   const openClientForm = () => {
@@ -143,122 +147,130 @@ const TrainerDashboard: React.FC = () => {
 
   return (
     <ClientProvider>
-      <Layout style={{ minHeight: '100vh' }}>
-        <Sider width={250} theme="light">
-          <div style={{ height: 64, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Title level={4}>Nutrition App</Title>
-          </div>
-          <Menu
-            mode="inline"
-            defaultSelectedKeys={['dashboard']}
-            defaultOpenKeys={['features']}
-            style={{ height: '100%' }}
-          >
-            <Menu.Item key="dashboard" icon={<UserOutlined />}>
-              Dashboard
-            </Menu.Item>
-            <Menu.SubMenu key="features" title="Features" icon={<AppstoreOutlined />}>
-              <Menu.Item key="clients" icon={<TeamOutlined />} onClick={() => handleMenuClick('/clients')}>
-                Manage Clients
+      <FoodItemProvider>
+        <Layout style={{ minHeight: '100vh' }}>
+          <Sider width={250} theme="light">
+            <div style={{ height: 64, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Title level={4}>Nutrition App</Title>
+            </div>
+            <Menu
+              mode="inline"
+              defaultSelectedKeys={['dashboard']}
+              defaultOpenKeys={['features']}
+              style={{ height: '100%' }}
+            >
+              <Menu.Item key="dashboard" icon={<UserOutlined />} onClick={() => setShowFoodItems(false)}>
+                Dashboard
               </Menu.Item>
-              <Menu.Item key="mealplans" icon={<FileOutlined />} onClick={() => handleMenuClick('/meal-plans')}>
-                Meal Plans
+              <Menu.SubMenu key="features" title="Features" icon={<AppstoreOutlined />}>
+                <Menu.Item key="clients" icon={<TeamOutlined />} onClick={() => handleMenuClick('/clients')}>
+                  Manage Clients
+                </Menu.Item>
+                <Menu.Item key="mealplans" icon={<FileOutlined />} onClick={() => handleMenuClick('/meal-plans')}>
+                  Meal Plans
+                </Menu.Item>
+                <Menu.Item key="fooditems" icon={<AppstoreOutlined />} onClick={toggleFoodItems}>
+                  Food Items
+                </Menu.Item>
+              </Menu.SubMenu>
+              <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+                Logout
               </Menu.Item>
-              <Menu.Item key="fooditems" icon={<AppstoreOutlined />} onClick={() => handleMenuClick('/food-items')}>
-                Food Items
-              </Menu.Item>
-            </Menu.SubMenu>
-            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              Logout
-            </Menu.Item>
-          </Menu>
-        </Sider>
-        <Layout>
-          <Header style={{ padding: '0 16px', background: '#fff' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
-              <div>
-                <Button 
-                  type="primary" 
-                  icon={<PlusOutlined />} 
-                  onClick={openClientForm}
-                >
-                  Add New Client
-                </Button>
+            </Menu>
+          </Sider>
+          <Layout>
+            <Header style={{ padding: '0 16px', background: '#fff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
+                <div>
+                  <Button 
+                    type="primary" 
+                    icon={<PlusOutlined />} 
+                    onClick={openClientForm}
+                  >
+                    Add New Client
+                  </Button>
+                </div>
+                {currentUser && (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Avatar icon={<UserOutlined />} />
+                    <Text strong style={{ marginLeft: 8 }}>
+                      {currentUser.name} (Trainer)
+                    </Text>
+                  </div>
+                )}
               </div>
-              {currentUser && (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <Avatar icon={<UserOutlined />} />
-                  <Text strong style={{ marginLeft: 8 }}>
-                    {currentUser.name} (Trainer)
-                  </Text>
+            </Header>
+            <Content style={{ margin: '24px 16px 0' }}>
+              {showFoodItems ? (
+                <div style={{ background: '#fff', minHeight: 360 }}>
+                  <FoodItems />
+                </div>
+              ) : (
+                <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                  <Title level={3}>Trainer Dashboard</Title>
+                  <Text>Welcome back, {currentUser?.name || 'Trainer'}! Here's what you can do:</Text>
+
+                  <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+                    {trainerFeatures.map((feature, index) => (
+                      <Col xs={24} sm={12} md={8} key={index}>
+                        <Card 
+                          hoverable
+                          onClick={() => feature.title === 'Food Item Management' ? toggleFoodItems() : handleMenuClick(feature.path)}
+                          actions={[
+                            <a key="go" onClick={(e) => {
+                              e.stopPropagation();
+                              feature.title === 'Food Item Management' ? toggleFoodItems() : handleMenuClick(feature.path);
+                            }}>
+                              Go to {feature.title}
+                            </a>
+                          ]}
+                        >
+                          <Card.Meta
+                            avatar={feature.icon}
+                            title={feature.title}
+                            description={feature.description}
+                          />
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+
+                  <div style={{ marginTop: 32 }}>
+                    <Title level={4}>Trainer Responsibilities</Title>
+                    <List
+                      bordered
+                      dataSource={[
+                        'Register and maintain your account',
+                        'Create and manage client profiles',
+                        'Create custom meal plans for clients',
+                        'Add and manage food items for meal plans',
+                        'Assign meal plans to specific clients'
+                      ]}
+                      renderItem={(item) => (
+                        <List.Item>
+                          <Text>{item}</Text>
+                        </List.Item>
+                      )}
+                    />
+                  </div>
                 </div>
               )}
-            </div>
-          </Header>
-          <Content style={{ margin: '24px 16px 0' }}>
-            <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-              <Title level={3}>Trainer Dashboard</Title>
-              <Text>Welcome back, {currentUser?.name || 'Trainer'}! Here's what you can do:</Text>
-
-              <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
-                {trainerFeatures.map((feature, index) => (
-                  <Col xs={24} sm={12} md={8} key={index}>
-                    <Card 
-                      hoverable
-                      onClick={() => handleMenuClick(feature.path)}
-                      actions={[
-                        <a key="go" onClick={(e) => {
-                          e.stopPropagation();
-                          handleMenuClick(feature.path);
-                        }}>
-                          Go to {feature.title}
-                        </a>
-                      ]}
-                    >
-                      <Card.Meta
-                        avatar={feature.icon}
-                        title={feature.title}
-                        description={feature.description}
-                      />
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-
-              <div style={{ marginTop: 32 }}>
-                <Title level={4}>Trainer Responsibilities</Title>
-                <List
-                  bordered
-                  dataSource={[
-                    'Register and maintain your account',
-                    'Create and manage client profiles',
-                    'Create custom meal plans for clients',
-                    'Add and manage food items for meal plans',
-                    'Assign meal plans to specific clients'
-                  ]}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <Text>{item}</Text>
-                    </List.Item>
-                  )}
-                />
-              </div>
-            </div>
-          </Content>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
 
-      {/* Client Creation Modal */}
-      <Modal
-        title="Create New Client"
-        open={showClientForm}
-        onCancel={closeClientForm}
-        footer={null}
-        width={800}
-        bodyStyle={{ padding: 0 }}
-      >
-        <ClientCreateForm />
-      </Modal>
+        {/* Client Creation Modal */}
+        <Modal
+          title="Create New Client"
+          open={showClientForm}
+          onCancel={closeClientForm}
+          footer={null}
+          width={800}
+          bodyStyle={{ padding: 0 }}
+        >
+          <ClientCreateForm />
+        </Modal>
+      </FoodItemProvider>
     </ClientProvider>
   );
 };
